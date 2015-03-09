@@ -78,3 +78,27 @@ def index = MyAction.any { case Z(authRequest, dbRequest) =>
 def index = MyAction.anyAsync { case Z(authRequest, dbRequest) =>
 ```
 
+## More Example
+
+```scala
+package controllers
+
+import play.api.mvc._
+import jp.t2v.lab.play2.actzip._
+
+object Application extends Controller  {
+
+  // it can chain more than 2
+  val Action3 = Action zip Action zip Action
+  
+  val Action4 = Action zip Action zip Action zip Action
+  
+  // ZippedAction can zip another ZipedAction
+  val Action7 = Action3 zip Action4
+
+  def index = Action7.any { case Z(_, _, _, _, _, _, _) =>
+    Ok(views.html.index("7 action are zipped"))
+  }
+
+}
+```
