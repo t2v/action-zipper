@@ -46,9 +46,9 @@ libraryDependencies += "jp.t2v" %% "action-zipper" % "0.1.0-SNAPSHOT"
 
 ## Alias
 
-`ZippedRequest` extructor is too long. so we define short name alias as `Z`
+### `Z` extractor
 
-It can write as follows
+`ZippedRequest` extractor is too long. so we define short name alias as `Z`
 
 ```scala
 def index = MyAction(parse.json) { case Z(r1, r2) =>
@@ -56,5 +56,25 @@ def index = MyAction(parse.json) { case Z(r1, r2) =>
   println(r2.dbSession)
   Ok(views.html.index("Your new application is ready."))
 }
+```
+
+
+### any and anyAsync
+
+Since `ActionBuilder#apply` and `ActionBuilder#async` are overloaded, we can not use `Pattern Matching Anonymous Functions`.
+
+```scala
+// compile error!!
+def index = MyAction { case Z(r1, r2) =>
+```
+
+So ZippedActionN has `any` and `anyAsync` method that can use instead of `apply` and `async`
+
+```scala
+def index = MyAction.any { case Z(r1, r2) =>
+```
+
+```scala
+def index = MyAction.anyAsync { case Z(r1, r2) =>
 ```
 
