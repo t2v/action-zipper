@@ -14,7 +14,7 @@ object Application extends Controller with AuthConfigImpl with AuthActionBuilder
 
   val MyAction = AuthenticationAction zip DBTxAction
 
-  def index = MyAction(parse.anyContent) { case Z(r1, r2) =>
+  def index = MyAction(parse.json) { case ZippedRequest(r1, r2) =>
     println(r1.user)
     println(r2.dbSession)
     Ok(views.html.index("Your new application is ready."))
@@ -23,4 +23,38 @@ object Application extends Controller with AuthConfigImpl with AuthActionBuilder
 }
 ```
 
+## Motivation
+
+`ActionBuilder` is Play2 standard action composition system. 
+
+It can compose other [ActionFunction](https://www.playframework.com/documentation/2.3.x/ScalaActionsComposition#Different-request-types)s that have same Request type.
+
+However, ActionBuilders that have different request type can not compose each other. (for example, `AuthenticationAction` and `DBAction`)
+
+Action-Zipper provides the way that make any `ActionBuilder`s enable to compose.
+
+
+## Installation
+
+Add dependency declarations into your `Build.scala` or `build.sbt` file:
+
+```scala
+resolvers           += Resolver.sonatypeRepo("snapshots")
+libraryDependencies += "jp.t2v" %% "action-zipper" % "0.1.0-SNAPSHOT"
+```
+
+
+## Alias
+
+`ZippedRequest` extructor is too long. so we define short name alias as `Z`
+
+It can write as follows
+
+```scala
+def index = MyAction(parse.json) { case Z(r1, r2) =>
+  println(r1.user)
+  println(r2.dbSession)
+  Ok(views.html.index("Your new application is ready."))
+}
+```
 
