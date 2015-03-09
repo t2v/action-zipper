@@ -10,20 +10,14 @@ object Application extends Controller with AuthConfigImpl with AuthActionBuilder
 
   val MyAction = OptionalAuthAction zip DBTxAction
 
-  val Foo = Action zip MyAction
+//  can not compile?
+//  val MyAction2 = OptionalAuthAction zip DBTxAction zip Action
+//  val Foo = Action zip MyAction
 
-  val Bar = MyAction zip Foo
-
-  def index = Bar.any { case Z(r1, r2, _, _, _) =>
+  def index = MyAction(parse.anyContent) { case (r1, r2, _) =>
     println(r1.user)
     println(r2.dbSession)
     Ok(views.html.index("Your new application is ready."))
-  }
-
-  def index2 = Bar.anyAsync { case Z(r1, r2, _, _, _) =>
-    println(r1.user)
-    println(r2.dbSession)
-    Future.successful(Ok(views.html.index("Your new application is ready.")))
   }
 
 }

@@ -1,34 +1,34 @@
 package jp.t2v.lab.play2
 
 import play.api.mvc._
+import jp.t2v.lab.func.{HApply, ~>}
+import scala.concurrent.Future
 
 package object actzip {
 
-  implicit class ActionBuilderOps[R1[_]](val b1: ActionBuilder[R1]) extends AnyVal {
+  implicit val actionBuilderHApply: HApply[ActionBuilder] = new HApply[ActionBuilder] {
+    def apply2[A1[_], A2[_], Z[_]](a1: ActionBuilder[A1], a2: ActionBuilder[A2])(f: λ[a => (A1[a], A2[a])] ~> Z) =
+      new ActionBuilder[Z] {
+        def invokeBlock[C](request: Request[C], block: Z[C] => Future[Result]) =
+          a1.invokeBlock[C](request, b1 =>
+            a2.invokeBlock[C](request, b2 =>
+              block(f((b1, b2)))
+            )
+          )
+      }
 
-    def zip[R2[_]](b2: ActionBuilder[R2]): ZippedAction2[R1, R2] = new ZippedAction2[R1, R2](b1, b2)
-    def zip[R2[_], R3[_]](z: ZippedAction2[R2, R3]): ZippedAction3[R1, R2, R3] = new ZippedAction3[R1, R2, R3](b1, z.b1, z.b2)
-    def zip[R2[_], R3[_], R4[_]](z: ZippedAction3[R2, R3, R4]): ZippedAction4[R1, R2, R3, R4] = new ZippedAction4[R1, R2, R3, R4](b1, z.b1, z.b2, z.b3)
-    def zip[R2[_], R3[_], R4[_], R5[_]](z: ZippedAction4[R2, R3, R4, R5]): ZippedAction5[R1, R2, R3, R4, R5] = new ZippedAction5[R1, R2, R3, R4, R5](b1, z.b1, z.b2, z.b3, z.b4)
-    def zip[R2[_], R3[_], R4[_], R5[_], R6[_]](z: ZippedAction5[R2, R3, R4, R5, R6]): ZippedAction6[R1, R2, R3, R4, R5, R6] = new ZippedAction6[R1, R2, R3, R4, R5, R6](b1, z.b1, z.b2, z.b3, z.b4, z.b5)
-    def zip[R2[_], R3[_], R4[_], R5[_], R6[_], R7[_]](z: ZippedAction6[R2, R3, R4, R5, R6, R7]): ZippedAction7[R1, R2, R3, R4, R5, R6, R7] = new ZippedAction7[R1, R2, R3, R4, R5, R6, R7](b1, z.b1, z.b2, z.b3, z.b4, z.b5, z.b6)
-    def zip[R2[_], R3[_], R4[_], R5[_], R6[_], R7[_], R8[_]](z: ZippedAction7[R2, R3, R4, R5, R6, R7, R8]): ZippedAction8[R1, R2, R3, R4, R5, R6, R7, R8] = new ZippedAction8[R1, R2, R3, R4, R5, R6, R7, R8](b1, z.b1, z.b2, z.b3, z.b4, z.b5, z.b6, z.b7)
-    def zip[R2[_], R3[_], R4[_], R5[_], R6[_], R7[_], R8[_], R9[_]](z: ZippedAction8[R2, R3, R4, R5, R6, R7, R8, R9]): ZippedAction9[R1, R2, R3, R4, R5, R6, R7, R8, R9] = new ZippedAction9[R1, R2, R3, R4, R5, R6, R7, R8, R9](b1, z.b1, z.b2, z.b3, z.b4, z.b5, z.b6, z.b7, z.b8)
-    def zip[R2[_], R3[_], R4[_], R5[_], R6[_], R7[_], R8[_], R9[_], R10[_]](z: ZippedAction9[R2, R3, R4, R5, R6, R7, R8, R9, R10]): ZippedAction10[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10] = new ZippedAction10[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10](b1, z.b1, z.b2, z.b3, z.b4, z.b5, z.b6, z.b7, z.b8, z.b9)
-    def zip[R2[_], R3[_], R4[_], R5[_], R6[_], R7[_], R8[_], R9[_], R10[_], R11[_]](z: ZippedAction10[R2, R3, R4, R5, R6, R7, R8, R9, R10, R11]): ZippedAction11[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11] = new ZippedAction11[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11](b1, z.b1, z.b2, z.b3, z.b4, z.b5, z.b6, z.b7, z.b8, z.b9, z.b10)
-    def zip[R2[_], R3[_], R4[_], R5[_], R6[_], R7[_], R8[_], R9[_], R10[_], R11[_], R12[_]](z: ZippedAction11[R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12]): ZippedAction12[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12] = new ZippedAction12[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12](b1, z.b1, z.b2, z.b3, z.b4, z.b5, z.b6, z.b7, z.b8, z.b9, z.b10, z.b11)
-    def zip[R2[_], R3[_], R4[_], R5[_], R6[_], R7[_], R8[_], R9[_], R10[_], R11[_], R12[_], R13[_]](z: ZippedAction12[R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13]): ZippedAction13[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13] = new ZippedAction13[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13](b1, z.b1, z.b2, z.b3, z.b4, z.b5, z.b6, z.b7, z.b8, z.b9, z.b10, z.b11, z.b12)
-    def zip[R2[_], R3[_], R4[_], R5[_], R6[_], R7[_], R8[_], R9[_], R10[_], R11[_], R12[_], R13[_], R14[_]](z: ZippedAction13[R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14]): ZippedAction14[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14] = new ZippedAction14[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14](b1, z.b1, z.b2, z.b3, z.b4, z.b5, z.b6, z.b7, z.b8, z.b9, z.b10, z.b11, z.b12, z.b13)
-    def zip[R2[_], R3[_], R4[_], R5[_], R6[_], R7[_], R8[_], R9[_], R10[_], R11[_], R12[_], R13[_], R14[_], R15[_]](z: ZippedAction14[R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15]): ZippedAction15[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15] = new ZippedAction15[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15](b1, z.b1, z.b2, z.b3, z.b4, z.b5, z.b6, z.b7, z.b8, z.b9, z.b10, z.b11, z.b12, z.b13, z.b14)
-    def zip[R2[_], R3[_], R4[_], R5[_], R6[_], R7[_], R8[_], R9[_], R10[_], R11[_], R12[_], R13[_], R14[_], R15[_], R16[_]](z: ZippedAction15[R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16]): ZippedAction16[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16] = new ZippedAction16[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16](b1, z.b1, z.b2, z.b3, z.b4, z.b5, z.b6, z.b7, z.b8, z.b9, z.b10, z.b11, z.b12, z.b13, z.b14, z.b15)
-    def zip[R2[_], R3[_], R4[_], R5[_], R6[_], R7[_], R8[_], R9[_], R10[_], R11[_], R12[_], R13[_], R14[_], R15[_], R16[_], R17[_]](z: ZippedAction16[R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17]): ZippedAction17[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17] = new ZippedAction17[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17](b1, z.b1, z.b2, z.b3, z.b4, z.b5, z.b6, z.b7, z.b8, z.b9, z.b10, z.b11, z.b12, z.b13, z.b14, z.b15, z.b16)
-    def zip[R2[_], R3[_], R4[_], R5[_], R6[_], R7[_], R8[_], R9[_], R10[_], R11[_], R12[_], R13[_], R14[_], R15[_], R16[_], R17[_], R18[_]](z: ZippedAction17[R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17, R18]): ZippedAction18[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17, R18] = new ZippedAction18[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17, R18](b1, z.b1, z.b2, z.b3, z.b4, z.b5, z.b6, z.b7, z.b8, z.b9, z.b10, z.b11, z.b12, z.b13, z.b14, z.b15, z.b16, z.b17)
-    def zip[R2[_], R3[_], R4[_], R5[_], R6[_], R7[_], R8[_], R9[_], R10[_], R11[_], R12[_], R13[_], R14[_], R15[_], R16[_], R17[_], R18[_], R19[_]](z: ZippedAction18[R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17, R18, R19]): ZippedAction19[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17, R18, R19] = new ZippedAction19[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17, R18, R19](b1, z.b1, z.b2, z.b3, z.b4, z.b5, z.b6, z.b7, z.b8, z.b9, z.b10, z.b11, z.b12, z.b13, z.b14, z.b15, z.b16, z.b17, z.b18)
-    def zip[R2[_], R3[_], R4[_], R5[_], R6[_], R7[_], R8[_], R9[_], R10[_], R11[_], R12[_], R13[_], R14[_], R15[_], R16[_], R17[_], R18[_], R19[_], R20[_]](z: ZippedAction19[R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17, R18, R19, R20]): ZippedAction20[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17, R18, R19, R20] = new ZippedAction20[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17, R18, R19, R20](b1, z.b1, z.b2, z.b3, z.b4, z.b5, z.b6, z.b7, z.b8, z.b9, z.b10, z.b11, z.b12, z.b13, z.b14, z.b15, z.b16, z.b17, z.b18, z.b19)
-    def zip[R2[_], R3[_], R4[_], R5[_], R6[_], R7[_], R8[_], R9[_], R10[_], R11[_], R12[_], R13[_], R14[_], R15[_], R16[_], R17[_], R18[_], R19[_], R20[_], R21[_]](z: ZippedAction20[R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17, R18, R19, R20, R21]): ZippedAction21[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17, R18, R19, R20, R21] = new ZippedAction21[R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15, R16, R17, R18, R19, R20, R21](b1, z.b1, z.b2, z.b3, z.b4, z.b5, z.b6, z.b7, z.b8, z.b9, z.b10, z.b11, z.b12, z.b13, z.b14, z.b15, z.b16, z.b17, z.b18, z.b19, z.b20)
-
+    def map[A[_], B[_]](fa: ActionBuilder[A])(f: A ~> B): ActionBuilder[B] = new ActionBuilder[B] {
+      def invokeBlock[C](request: Request[C], block: B[C] => Future[Result]) =
+        fa.invokeBlock[C](request, a => block(f(a)))
+    }
   }
 
-  val Z = ZippedRequest
+  implicit class HApplyOps[F[_[_]], A1[_]](val self: F[A1])(implicit val F: HApply[F]) {
+
+    final def zip[A2[_]](f: F[A2]): F[λ[a => (A1[a], A2[a])]] = F.tuple2(self, f)
+
+//    final def zip[A2[_], A3[_]](f: F[λ[a => (A2[a], A3[a])]]): F[λ[a => (A1[a], A2[a], A3[a])]] = F.tuple2(self, f)
+
+  }
 
 }
