@@ -1,4 +1,4 @@
-# ActionZipper
+# ActionZipper [![Build Status](https://travis-ci.org/t2v/action-zipper.svg?branch=feature%2Ftravis)](https://travis-ci.org/t2v/action-zipper)
 
 Play2 ActionBuilder Composition Support
 
