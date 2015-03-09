@@ -14,9 +14,9 @@ object Application extends Controller with AuthConfigImpl with AuthActionBuilder
 
   val MyAction = AuthenticationAction zip DBTxAction
 
-  def index = MyAction(parse.json) { case ZippedRequest(r1, r2) =>
-    println(r1.user)
-    println(r2.dbSession)
+  def index = MyAction(parse.json) { case ZippedRequest(authRequest, dbRequest) =>
+    println(authRequest.user)
+    println(dbRequest.dbSession)
     Ok(views.html.index("Your new application is ready."))
   }
 
@@ -51,9 +51,9 @@ libraryDependencies += "jp.t2v" %% "action-zipper" % "0.1.0-SNAPSHOT"
 `ZippedRequest` extractor is too long. so we define short name alias as `Z`
 
 ```scala
-def index = MyAction(parse.json) { case Z(r1, r2) =>
-  println(r1.user)
-  println(r2.dbSession)
+def index = MyAction(parse.json) { case Z(authRequest, dbRequest) =>
+  println(authRequest.user)
+  println(dbRequest.dbSession)
   Ok(views.html.index("Your new application is ready."))
 }
 ```
@@ -65,16 +65,16 @@ Since `ActionBuilder#apply` and `ActionBuilder#async` are overloaded, we can not
 
 ```scala
 // compile error!!
-def index = MyAction { case Z(r1, r2) =>
+def index = MyAction { case Z(authRequest, dbRequest) =>
 ```
 
 So ZippedActionN has `any` and `anyAsync` method that can use instead of `apply` and `async`
 
 ```scala
-def index = MyAction.any { case Z(r1, r2) =>
+def index = MyAction.any { case Z(authRequest, dbRequest) =>
 ```
 
 ```scala
-def index = MyAction.anyAsync { case Z(r1, r2) =>
+def index = MyAction.anyAsync { case Z(authRequest, dbRequest) =>
 ```
 
