@@ -66,7 +66,8 @@ lazy val core = (project in file("core")).
     scalacOptions ++= _scalacOptions,
     resolvers ++= Seq(
       Resolver.sonatypeRepo("releases"),
-      Resolver.typesafeRepo("releases")
+      Resolver.typesafeRepo("releases"),
+      "bintray/non" at "http://dl.bintray.com/non/maven"
     ),
     libraryDependencies ++=
       ("com.typesafe.play"  %% "play"      % "2.3.7"  %   "provided") ::
@@ -87,7 +88,8 @@ lazy val core = (project in file("core")).
     publishArtifact in Test := _publishArtifactInTest,
     pomIncludeRepository    := _pomIncludeRepository,
     publishTo               <<=(version)(_publishTo),
-    pomExtra                := _pomExtra
+    pomExtra                := _pomExtra,
+    addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.5.2")
   )
 
 lazy val sample = (project in file("sample")).
