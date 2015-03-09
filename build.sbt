@@ -65,7 +65,8 @@ lazy val core = (project in file("core")).
     crossScalaVersions := _crossScalaVersions,
     scalacOptions ++= _scalacOptions,
     resolvers ++= Seq(
-      Resolver.sonatypeRepo("releases")
+      Resolver.sonatypeRepo("releases"),
+      Resolver.typesafeRepo("releases")
     ),
     libraryDependencies ++=
       ("com.typesafe.play"  %% "play"      % "2.3.7"  %   "provided") ::
