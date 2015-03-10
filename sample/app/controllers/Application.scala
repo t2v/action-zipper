@@ -14,16 +14,22 @@ object Application extends Controller with AuthConfigImpl with AuthActionBuilder
 
   val Bar = MyAction zip Foo
 
-  def index = Bar.any { case Z(r1, r2, _, _, _) =>
+  def index = Bar.any { case (r1, r2, _, _, _) =>
     println(r1.user)
     println(r2.dbSession)
     Ok(views.html.index("Your new application is ready."))
   }
 
-  def index2 = Bar.anyAsync { case Z(r1, r2, _, _, _) =>
+  def index2 = Bar.anyAsync { case (r1, r2, _, _, _) =>
     println(r1.user)
     println(r2.dbSession)
     Future.successful(Ok(views.html.index("Your new application is ready.")))
+  }
+
+  def index3 = Bar(parse.json) { case (r1, r2, _, _, _) =>
+    println(r1.user)
+    println(r2.dbSession)
+    Ok(views.html.index("Your new application is ready."))
   }
 
 }

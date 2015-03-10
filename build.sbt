@@ -74,10 +74,8 @@ lazy val core = (project in file("core")).
     Nil,
     (sourceGenerators in Compile) += task[Seq[File]] {
       val dir = (sourceManaged in Compile).value / "jp" / "t2v" / "lab" / "play2" / "actzip"
-      val requests = dir / "requests.scala"
-      IO.write(requests, RequestGenerator())
-      requests +: (2 to 21).map { i =>
-        val action = ActionGenerator(i, 21)
+      (2 to 22).map { i =>
+        val action = ActionGenerator(i, 22)
         val file = dir / s"ZippedAction$i.scala"
         IO.write(file, action)
         file
