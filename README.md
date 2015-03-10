@@ -14,7 +14,7 @@ object Application extends Controller with AuthConfigImpl with AuthActionBuilder
 
   val MyAction = AuthenticationAction zip DBTxAction
 
-  def index = MyAction(parse.json) { case ZippedRequest(authRequest, dbRequest) =>
+  def index = MyAction(parse.json) { case (authRequest, dbRequest) =>
     println(authRequest.user)
     println(dbRequest.dbSession)
     Ok(views.html.index("Your new application is ready."))
@@ -46,36 +46,23 @@ libraryDependencies += "jp.t2v" %% "action-zipper" % "0.1.0-SNAPSHOT"
 
 ## Alias
 
-### `Z` extractor
-
-`ZippedRequest` extractor is too long. so we define short name alias as `Z`
-
-```scala
-def index = MyAction(parse.json) { case Z(authRequest, dbRequest) =>
-  println(authRequest.user)
-  println(dbRequest.dbSession)
-  Ok(views.html.index("Your new application is ready."))
-}
-```
-
-
 ### any and anyAsync
 
 Since `ActionBuilder#apply` and `ActionBuilder#async` are overloaded, we can not use `Pattern Matching Anonymous Functions`.
 
 ```scala
 // compile error!!
-def index = MyAction { case Z(authRequest, dbRequest) =>
+def index = MyAction { case (authRequest, dbRequest) =>
 ```
 
 So ZippedActionN has `any` and `anyAsync` method that can use instead of `apply` and `async`
 
 ```scala
-def index = MyAction.any { case Z(authRequest, dbRequest) =>
+def index = MyAction.any { case (authRequest, dbRequest) =>
 ```
 
 ```scala
-def index = MyAction.anyAsync { case Z(authRequest, dbRequest) =>
+def index = MyAction.anyAsync { case (authRequest, dbRequest) =>
 ```
 
 ## More Example
@@ -96,7 +83,7 @@ object Application extends Controller  {
   // ZippedAction can zip another ZipedAction
   val Action7 = Action3 zip Action4
 
-  def index = Action7.any { case Z(_, _, _, _, _, _, _) =>
+  def index = Action7.any { case (_, _, _, _, _, _, _) =>
     Ok(views.html.index("7 action are zipped"))
   }
 
