@@ -39,8 +39,7 @@ Action-Zipper provides the way that make any `ActionBuilder`s enable to compose.
 Add dependency declarations into your `Build.scala` or `build.sbt` file:
 
 ```scala
-resolvers           += Resolver.sonatypeRepo("snapshots")
-libraryDependencies += "jp.t2v" %% "action-zipper" % "0.1.0-SNAPSHOT"
+libraryDependencies += "jp.t2v" %% "action-zipper" % "0.1.0"
 ```
 
 
