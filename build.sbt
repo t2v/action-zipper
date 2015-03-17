@@ -1,6 +1,6 @@
 val _version = "0.1.0"
 
-val _crossScalaVersions = Seq("2.11.6", "2.10.4")
+val _crossScalaVersions = Seq("2.11.6", "2.10.5")
 
 val _org = "jp.t2v"
 
