@@ -1,6 +1,6 @@
-val _version = "0.1.0"
+val _version = "0.2.0"
 
-val _crossScalaVersions = Seq("2.11.6", "2.10.5")
+val _crossScalaVersions = Seq("2.12.7", "2.11.12")
 
 val _org = "jp.t2v"
 
@@ -49,11 +49,12 @@ lazy val root = (project in file(".")).
   aggregate(core, sample).
   settings(
     aggregate in update := false,
+    scalaVersion        := "2.12.7",
     crossScalaVersions  := _crossScalaVersions,
     publish             := { },
     publishArtifact     := false,
     packagedArtifacts   := Map.empty,
-    publishTo           <<=(version)(_publishTo),
+    publishTo           := _publishTo(_version),
     pomExtra            := _pomExtra
   )
 
@@ -62,6 +63,7 @@ lazy val core = (project in file("core")).
     organization := _org,
     name := "action-zipper",
     version := _version,
+    scalaVersion := "2.12.7",
     crossScalaVersions := _crossScalaVersions,
     scalacOptions ++= _scalacOptions,
     resolvers ++= Seq(
@@ -69,7 +71,7 @@ lazy val core = (project in file("core")).
       Resolver.typesafeRepo("releases")
     ),
     libraryDependencies ++=
-      ("com.typesafe.play"  %% "play"      % "2.3.7"  %   "provided") ::
+      ("com.typesafe.play"  %% "play"      % "2.6.20"  %   "provided") ::
 //      ("com.chuusai"        %% "shapeless" % "2.0.0"                ) ::
     Nil,
     (sourceGenerators in Compile) += task[Seq[File]] {
@@ -84,7 +86,7 @@ lazy val core = (project in file("core")).
     publishMavenStyle       := _publishMavenStyle,
     publishArtifact in Test := _publishArtifactInTest,
     pomIncludeRepository    := _pomIncludeRepository,
-    publishTo               <<=(version)(_publishTo),
+    publishTo               := _publishTo(_version),
     pomExtra                := _pomExtra
   )
 
@@ -92,24 +94,17 @@ lazy val sample = (project in file("sample")).
   dependsOn(core).
   enablePlugins(PlayScala).
   settings(
+    scalaVersion := "2.12.7",
     scalacOptions ++= _scalacOptions,
     crossScalaVersions := _crossScalaVersions,
     libraryDependencies ++=
-      ("com.h2database"           %  "h2"                                  % "1.4.+") ::
-      ("ch.qos.logback"           %  "logback-classic"                     % "1.1.+") ::
-      ("jp.t2v"                  %%  "play2-auth"                          % "0.13.0") ::
-      ("org.scalikejdbc"         %% "scalikejdbc"                          % "2.2.4") ::
-      ("org.scalikejdbc"         %% "scalikejdbc-config"                   % "2.2.4") ::
-      ("org.scalikejdbc"         %% "scalikejdbc-syntax-support-macro"     % "2.2.4") ::
-      ("org.scalikejdbc"         %% "scalikejdbc-test"                     % "2.2.4"   % "test") ::
-      ("org.scalikejdbc"         %% "scalikejdbc-play-plugin"              % "2.3.6") ::
-      ("org.scalikejdbc"         %% "scalikejdbc-play-fixture-plugin"      % "2.3.6") ::
-      ("com.github.tototoshi"    %% "play-flyway"                          % "1.2.1") ::
+      guice ::
+      ("org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % "test") ::
       Nil,
     publish           := { },
     publishArtifact   := false,
     packagedArtifacts := Map.empty,
-    publishTo         <<=(version)(_publishTo),
+    publishTo         := _publishTo(_version),
     pomExtra          := _pomExtra
   )
 
