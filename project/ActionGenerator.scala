@@ -13,11 +13,14 @@ object ActionGenerator {
 s"""
 package jp.t2v.lab.play2.actzip
 
-import play.api.mvc.{Result, Request, ActionBuilder, AnyContent, Action}
+import play.api.mvc.{Result, Request, ActionBuilder, AnyContent, Action, BodyParser}
 import play.api.mvc.BodyParsers._
-import scala.concurrent.Future
+import scala.concurrent.{Future, ExecutionContext}
 
-class ZippedAction$i[$existentialTypes](${(1 to i).map(j => s"val b$j: ActionBuilder[R$j]").mkString(", ")}) extends ActionBuilder[({type L[A] = ($concreteTypes)})#L] {
+class ZippedAction$i[$existentialTypes, B](${(1 to i).map(j => s"val b$j: ActionBuilder[R$j, B]").mkString(", ")})(implicit ec: ExecutionContext) extends ActionBuilder[({type L[A] = ($concreteTypes)})#L, B] {
+
+  override def parser: BodyParser[B] = b1.parser
+  override protected def executionContext: ExecutionContext = ec
 
   override def invokeBlock[A](request: Request[A], block: (($concreteTypes)) => Future[Result]): Future[Result] = {
 ${(1 to i).map(j => s"    b$j.invokeBlock(request, { r$j: R$j[A] =>").mkString("\n")}
@@ -27,7 +30,7 @@ ${(1 to i).map(j => s"    })").mkString("\n")}
 
 ${if (i < lastIndex) {
   val n = i + 1
-  s"  def zip[R$n[_]](b$n: ActionBuilder[R$n]): ZippedAction$n[$higherKindTypes, R$n] = new ZippedAction$n(${(1 to i).map(j => s"b$j").mkString(", ")}, b$n)"
+  s"  def zip[R$n[_]](b$n: ActionBuilder[R$n, B]): ZippedAction$n[$higherKindTypes, R$n, B] = new ZippedAction$n(${(1 to i).map(j => s"b$j").mkString(", ")}, b$n)"
 } else ""}
 
 ${if (i < lastIndex - 1) {
@@ -35,7 +38,7 @@ ${if (i < lastIndex - 1) {
     val kk = ((i+1) to (i + zi)).map(j => s"R$j[_]").mkString(", ")
     val k = ((i+1) to (i + zi)).map(j => s"R$j").mkString(", ")
     val n = i + zi
-    s"  def zip[$kk](z: ZippedAction$zi[$k]): ZippedAction$n[$higherKindTypes, $k] = new ZippedAction$n(${(1 to i).map(j => s"b$j").mkString(", ")}, ${(1 to zi).map(j => s"z.b$j").mkString(", ")})"
+    s"  def zip[$kk](z: ZippedAction$zi[$k, B]): ZippedAction$n[$higherKindTypes, $k, B] = new ZippedAction$n(${(1 to i).map(j => s"b$j").mkString(", ")}, ${(1 to zi).map(j => s"z.b$j").mkString(", ")})"
   }.mkString("\n")
 } else "" }
 

@@ -6,18 +6,19 @@ Play2 ActionBuilder Composition Support
 package controllers
 
 import play.api.mvc._
-import jp.t2v.lab.play2.auth.AuthActionBuilders
-import scalikejdbc.DBActionBuilders
 import jp.t2v.lab.play2.actzip._
+import scala.concurrent.{ExecutionContext, Future}
 
-object Application extends Controller with AuthConfigImpl with AuthActionBuilders with DBActionBuilders {
+class Application (cc: ControllerComponents) extends AbstractController(cc) {
 
-  val MyAction = AuthenticationAction zip DBTxAction
+  private implicit val ec: ExecutionContext = cc.executionContext
 
-  def index = MyAction(parse.json) { case (authRequest, dbRequest) =>
+  val MyAction = AuthAction zip DBTxAction
+
+  def index = MyAction.async(parse.json) { case (authRequest, dbRequest) =>
     println(authRequest.user)
     println(dbRequest.dbSession)
-    Ok(views.html.index("Your new application is ready."))
+    Future.successful(Ok(views.html.index("Your new application is ready.")))
   }
 
 }
@@ -39,9 +40,13 @@ Action-Zipper provides the way that make any `ActionBuilder`s enable to compose.
 Add dependency declarations into your `Build.scala` or `build.sbt` file:
 
 ```scala
-libraryDependencies += "jp.t2v" %% "action-zipper" % "0.1.0"
+libraryDependencies += "jp.t2v" %% "action-zipper" % "0.2.0"
 ```
 
+## Target
+
+- Scala 2.11.x & Scala 2.12.x
+- Play 2.6.x
 
 ## Alias
 
@@ -71,8 +76,11 @@ package controllers
 
 import play.api.mvc._
 import jp.t2v.lab.play2.actzip._
+import scala.concurrent.{ExecutionContext, Future}
 
-object Application extends Controller  {
+class Application (cc: ControllerComponents) extends AbstractController(cc) {
+
+  private implicit val ec: ExecutionContext = cc.executionContext
 
   // it can chain more than 2
   val Action3 = Action zip Action zip Action
